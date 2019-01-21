@@ -1,0 +1,35 @@
+resource "aws_security_group" "swarm"{
+	vpc_id = "${aws_vpc.docker_swarm.id}"
+	name = "allow-ssh"
+	description = "security group that allow ssh and all egress traffic"
+	egress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["0.0.0.0/0"]
+	}
+	ingress {
+		from_port = 0
+		to_port = 0
+		protocol = "-1"
+		cidr_blocks = ["123.201.36.114/32"]
+	}
+	ingress {
+	from_port = 22
+	to_port = 22
+	protocol = "tcp"
+	cidr_blocks = ["0.0.0.0/0"]
+	}
+
+	ingress {
+        	from_port = 0
+        	to_port = 65535
+        	protocol = "-1"
+        	cidr_blocks = ["10.0.1.0/24"]
+		self = true
+        }
+
+	tags {
+		Name = "swarm"
+	}
+}
