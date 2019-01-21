@@ -1,0 +1,23 @@
+---
+- name: Bootstrap a host without python2 installed
+  hosts: all
+  gather_facts: no
+  tasks:
+  - raw: sudo apt-get update
+  - raw: sudo apt-get -y install python
+- name: install and start docker-engine on manager node
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks:
+   - debug: var=inventory_hostname
+   - debug: var=ansible_hostname
+#   - debug: var=hostvars
+  roles:
+   - role: docker_swarm_aws
+     when: inventory_hostname in groups['managernode']
+   - role: docker_swarm_aws_worker
+     when: inventory_hostname in groups['workernode']
+   - role: container_deployment
+     when: inventory_hostname in groups['managernode']
+     

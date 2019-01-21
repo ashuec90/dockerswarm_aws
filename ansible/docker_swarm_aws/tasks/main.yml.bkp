@@ -1,0 +1,35 @@
+---
+# tasks file for docker_swarm_aws
+#- name: 'install docker dependencies'
+#  apt:
+#    name: '{{ item }}'
+#    state: 'present'
+#  with_items:
+#    - 'apt-transport-https'
+#    - 'ca-certificates'
+- name: 'add docker repo apt key'
+   shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+   shell: add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
+#  register: 'add_repository_key'
+#  ignore_errors: true
+- name: 'add Docker repository'
+  apt_repository:
+    repo: '{{ docker_apt_repository }}'
+    state: 'present'
+    update_cache: 'yes'
+- name: 'install docker'
+  apt:
+    name: 'docker-ce={{ docker_version }}'
+    state: 'present'
+- name: 'enable docker systemd service'
+  service:
+    name: 'docker'
+    state: 'started'
+    enabled: 'yes'
+#- name: 'add users to docker group'
+#  user:
+#    name: '{{ item }}'
+#    groups: 'docker'
+#    append: 'yes'
+#  with_items: '{{ docker_group_members }}'
+#  when: 'docker_group_members is defined'

@@ -1,0 +1,7 @@
+[managernode]
+10.0.1.203
+[workernode]
+10.0.2.160
+10.0.2.190
+[all:vars]
+manager_ip=10.0.1.203

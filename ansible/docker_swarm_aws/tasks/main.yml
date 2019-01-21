@@ -1,0 +1,56 @@
+---
+- name: 'add docker repo apt key'
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- name: 'add Docker repository'
+  apt_repository:
+    repo: '{{ docker_apt_repository }}'
+    state: 'present'
+    update_cache: 'yes'
+- name: install docker packages
+  apt:
+   name: "{{ item }}"
+   state: present
+   update_cache: yes
+  with_items:
+   - apt-transport-https
+   - ca-certificates
+   - curl
+   - software-properties-common
+   - docker-ce
+- name: 'enable docker systemd service'
+  service:
+    name: 'docker'
+    state: 'started'
+    enabled: 'yes'
+- name: 'initializing swarm mode in manager node'
+  command: docker swarm init --advertise-addr={{ ansible_eth0.ipv4.address }}:2377 --listen-addr={{ ansible_eth0.ipv4.address }}:2377
+  ignore_errors: yes
+   #shell: docker swarm init --advertise-addr=192.168.0.22:2377 --listen-addr=192.168.0.22:2377
+#- name: Get Worker Token
+#  shell: docker swarm join-token worker | grep docker
+#  register: worker_token
+#- name: Get Manager Token
+#  shell: docker swarm join-token manager | grep docker
+#  register: manager_token
+#- name: Show Worker Token
+#  debug: var=worker_token.stdout
+#- name: Show Manager Token
+#  debug: var=manager_token.stdout
+#- name: set facts for tokens     
+#  set_fact:
+#   worker: "{{ worker_token.stdout }}"
+#  when: inventory_hostname == 'swarm_managernode'
+#- name: print worker
+#  debug:
+#   msg: "{{worker }}-{{inventory_hostname}}"
+#- name: show worker token
+#  debug: var=hostvars.swarm_managernode.worker_token.stdout
+
+
+#- name: 'add users to docker group'
+#  user:
+#    name: '{{ item }}'
+#    groups: 'docker'
+#    append: 'yes'
+#  with_items: '{{ docker_group_members }}'
+#  when: 'docker_group_members is defined'

@@ -1,0 +1,37 @@
+---
+- name: 'add docker repo apt key'
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- name: 'add Docker repository'
+  apt_repository:
+    repo: '{{ docker_apt_repository }}'
+    state: 'present'
+    update_cache: 'yes'
+- name: install docker packages
+  apt:
+   name: "{{ item }}"
+   state: present
+   update_cache: yes
+  with_items:
+   - apt-transport-https
+   - ca-certificates
+   - curl
+   - software-properties-common
+   - docker-ce
+- name: 'enable docker systemd service'
+  service:
+    name: 'docker'
+    state: 'started'
+    enabled: 'yes'
+- name: show worker token
+  #debug: var=hostvars.10.43.12.138.worker_token.stdout
+  debug: var=worker
+- name: Join Swarm Cluster as a Worker
+  command: {{ worker }} --advertise-addr={{ ansible_eth0.ipv4.address }}:2377 --listen-addr={{ ansible_eth0.ipv4.address }}:2377
+#  register: worker
+#- name: 'add users to docker group'
+#  user:
+#    name: '{{ item }}'
+#    groups: 'docker'
+#    append: 'yes'
+#  with_items: '{{ docker_group_members }}'
+#  when: 'docker_group_members is defined'

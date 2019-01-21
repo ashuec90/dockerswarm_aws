@@ -1,0 +1,15 @@
+---
+# tasks file for container_deployment
+- name: Install pip
+  apt: name=python-pip state=present
+- name: install docker-py package
+  pip: name=docker-py
+#- name: Ensure web based hello world container is running
+#  docker_container:
+#   name: web_hello_world
+#   image: nigelpoulton/pluralsight-docker-ci
+#   ports:
+#    - 8080:8080
+#   state: started
+- name: creating service in docker swarm
+  shell: docker service create --name ashu -p 8080:8080 --replicas 5 nigelpoulton/pluralsight-docker-ci
